@@ -1,35 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  <title>MoodTunes - Emotion-Based Music Player</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(-45deg, #667eea, #764ba2, #6b73ff, #a996ff);
-      background-size: 600% 600%;
-      animation: gradientBG 20s ease infinite;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-      color: white;
-      flex-direction: column;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <title>MoodTunes - Emotion-Based Music Player</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(-45deg, #667eea, #764ba2, #6b73ff, #a996ff);
+        background-size: 600% 600%;
+        animation: gradientBG 20s ease infinite;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        color: white;
+        flex-direction: column;
+      }
 
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      25% { background-position: 50% 0%; }
-      50% { background-position: 100% 50%; }
-      75% { background-position: 50% 100%; }
-      100% { background-position: 0% 50%; }
-    }
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        25% {
+          background-position: 50% 0%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        75% {
+          background-position: 50% 100%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
 
-     .container {
+      .container {
         text-align: center;
         z-index: 2;
         display: flex;
@@ -37,191 +50,230 @@
         justify-content: center;
         flex-direction: column;
       }
-    video {
-      border-radius: 50%;
-      width: 200px;
-      height: 200px;
-      object-fit: cover;
-      border: 5px solid white;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
-      display: none;
-      transform: scaleX(-1); /* ✅ Mirror effect fixed */
-    }
-    .emotion {
-      font-size: 2rem;
-      margin-top: 20px;
-      font-weight: bold;
-    }
-    .song-box {
-      margin-top: 30px;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 15px;
-    }
-    .song-box h3 {
-      margin-bottom: 10px;
-    }
-    .play {
-      background: #7f5eb751;
-      width: 40px;
-      height: 40px;
-      border: 1px solid #fff;
-      font-size: 22px;
-      border-radius: 50%;
-      padding-top: 6px;
-      padding-left: 6px;
-      margin: 0 auto;
-      cursor: pointer;
-      transition: .3s linear;
-    }
-    .play:hover {
-      transform: scale(1.1);
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: white;
-      color: #764ba2;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s, color 0.3s;
-    }
-    button:hover {
-      background: #764ba2;
-      color: white;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>MoodTunes 🎶</h1>
-    <video id="webcam" autoplay muted></video>
-    <div class="emotion" id="emotion">Detecting Mood...</div>
-    <div class="song-box">
-      <h2 class="play">
-        <i class="bi bi-play-fill"></i>
-      </h2>
-      <h3>Recommended Song</h3>
-      <div id="song">🎵 Waiting for mood...</div>
-    </div>
-    <button onclick="requestCameraAccess()">Allow Camera</button>
-    <button onclick="startAutoDetection()">Scan My Mood</button>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-  <script>
-    const moodSongs = {
-      happy: "Pharrell Williams - Happy",
-      sad: "Adele - Someone Like You",
-      angry: "Eminem - Lose Yourself",
-      surprised: "Katy Perry - Firework",
-      neutral: "Coldplay - Paradise",
-      fearful: "Radiohead - Creep",
-      disgusted: "System Of A Down - Toxicity"
-    };
-
-    const songs = [
-      { title: 'Feel-Good', type: 'happy', src: 'Feel-Good(chosic.com).mp3' },
-      { title: 'Heartbreaking', type: 'sad', src: 'Heartbreaking(chosic.com).mp3' },
-      { title: 'Metaphonk', type: 'angry', src: 'Metaphonk-Long-Version(chosic.com).mp3' },
-      { title: 'Code Switch', type: 'surprised', src: 'Punch-Deck-Code-Switch-chosic.com_.mp3' },
-      { title: 'Birds Singing', type: 'neutral', src: 'dcpoke__birds-singing-03(chosic.com).mp3' },
-      { title: 'One Day', type: 'fearful', src: 'Roa-One-Day(chosic.com).mp3' },
-      { title: 'Lost and Found', type: 'disgusted', src: 'Lost-and-Found(chosic.com).mp3' }
-    ];
-
-    let music = new Audio();
-
-    function getSong(type) {
-      const filtered = songs.filter(s => s.type.toLowerCase() === type.toLowerCase());
-      if (!filtered.length) return null;
-      const random = filtered[Math.floor(Math.random() * filtered.length)];
-      music.src = 'music/' + random.src;
-      music.play();
-      return random.title;
-    }
-
-    document.querySelector('.play').addEventListener('click', () => {
-      if (music.paused) {
-        music.play();
-        document.querySelector('.play').innerHTML = `<i class="bi bi-pause-fill"></i>`;
-      } else {
-        music.pause();
-        document.querySelector('.play').innerHTML = `<i class="bi bi-play-fill"></i>`;
+      video {
+        border-radius: 50%;
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border: 5px solid white;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+        display: none;
+        transform: scaleX(-1); /* ✅ Mirror effect fixed */
       }
-    });
+      .emotion {
+        font-size: 2rem;
+        margin-top: 20px;
+        font-weight: bold;
+      }
+      .song-box {
+        margin-top: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 15px;
+      }
+      .song-box h3 {
+        margin-bottom: 10px;
+      }
+      .play {
+        background: #7f5eb751;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #fff;
+        font-size: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.3s linear;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .play .bi-play-fill {
+        padding-left: 3px;
+      }
+      .play:hover {
+        transform: scale(1.1);
+      }
+      button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: white;
+        color: #764ba2;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s, color 0.3s;
+      }
+      button:hover {
+        background: #764ba2;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>MoodTunes 🎶</h1>
+      <video id="webcam" autoplay muted></video>
+      <div class="emotion" id="emotion">Detecting Mood...</div>
+      <div class="song-box">
+        <h2 class="play">
+          <i class="bi bi-play-fill"></i>
+        </h2>
+        <h3>Recommended Song</h3>
+        <div id="song">🎵 Waiting for mood...</div>
+      </div>
+      <button onclick="requestCameraAccess()">Allow Camera</button>
+      <button onclick="startAutoDetection()">Scan My Mood</button>
+    </div>
 
-    let streamStarted = false;
-    let webcam, emotionEl, songEl;
-    let detectionInterval = null;
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script>
+      const moodSongs = {
+        happy: "Pharrell Williams - Happy",
+        sad: "Adele - Someone Like You",
+        angry: "Eminem - Lose Yourself",
+        surprised: "Katy Perry - Firework",
+        neutral: "Coldplay - Paradise",
+        fearful: "Radiohead - Creep",
+        disgusted: "System Of A Down - Toxicity",
+      };
 
-    window.onload = async () => {
-      webcam = document.getElementById('webcam');
-      emotionEl = document.getElementById('emotion');
-      songEl = document.getElementById('song');
-      await loadModels();
-    };
+      const songs = [
+        { title: "Feel-Good", type: "happy", src: "Feel-Good(chosic.com).mp3" },
+        {
+          title: "Heartbreaking",
+          type: "sad",
+          src: "Heartbreaking(chosic.com).mp3",
+        },
+        {
+          title: "Metaphonk",
+          type: "angry",
+          src: "Metaphonk-Long-Version(chosic.com).mp3",
+        },
+        {
+          title: "Code Switch",
+          type: "surprised",
+          src: "Punch-Deck-Code-Switch-chosic.com_.mp3",
+        },
+        {
+          title: "Birds Singing",
+          type: "neutral",
+          src: "dcpoke__birds-singing-03(chosic.com).mp3",
+        },
+        {
+          title: "One Day",
+          type: "fearful",
+          src: "Roa-One-Day(chosic.com).mp3",
+        },
+        {
+          title: "Lost and Found",
+          type: "disgusted",
+          src: "Lost-and-Found(chosic.com).mp3",
+        },
+      ];
 
-    async function loadModels() {
-      const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
-      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-      await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
-    }
+      let music = new Audio();
 
-    async function requestCameraAccess() {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const hasCamera = devices.some(device => device.kind === 'videoinput');
+      function getSong(type) {
+        const filtered = songs.filter(
+          (s) => s.type.toLowerCase() === type.toLowerCase()
+        );
+        if (!filtered.length) return null;
+        const random = filtered[Math.floor(Math.random() * filtered.length)];
+        music.src = "music/" + random.src;
+        music.play();
+        return random.title;
+      }
 
-        if (!hasCamera) {
-          alert("No webcam found on this device.");
-          emotionEl.innerText = "No webcam available.";
+      document.querySelector(".play").addEventListener("click", () => {
+        if (music.paused) {
+          music.play();
+          document.querySelector(
+            ".play"
+          ).innerHTML = `<i class="bi bi-pause-fill"></i>`;
+        } else {
+          music.pause();
+          document.querySelector(
+            ".play"
+          ).innerHTML = `<i class="bi bi-play-fill"></i>`;
+        }
+      });
+
+      let streamStarted = false;
+      let webcam, emotionEl, songEl;
+      let detectionInterval = null;
+
+      window.onload = async () => {
+        webcam = document.getElementById("webcam");
+        emotionEl = document.getElementById("emotion");
+        songEl = document.getElementById("song");
+        await loadModels();
+      };
+
+      async function loadModels() {
+        const MODEL_URL =
+          "https://justadudewhohacks.github.io/face-api.js/models";
+        await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+      }
+
+      async function requestCameraAccess() {
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const hasCamera = devices.some(
+            (device) => device.kind === "videoinput"
+          );
+
+          if (!hasCamera) {
+            alert("No webcam found on this device.");
+            emotionEl.innerText = "No webcam available.";
+            return;
+          }
+
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" },
+          });
+
+          webcam.srcObject = stream;
+          webcam.style.display = "block";
+          streamStarted = true;
+        } catch (err) {
+          console.error("Error accessing webcam:", err);
+          alert("Camera access denied. Please allow access and try again.");
+        }
+      }
+
+      async function detectEmotion() {
+        if (!streamStarted) return;
+
+        const detection = await faceapi
+          .detectSingleFace(webcam, new faceapi.TinyFaceDetectorOptions())
+          .withFaceExpressions();
+
+        if (detection && detection.expressions) {
+          const expressions = detection.expressions;
+          const sorted = Object.entries(expressions).sort(
+            (a, b) => b[1] - a[1]
+          );
+          const topEmotion = sorted[0][0];
+          emotionEl.innerText = `😃 Mood: ${topEmotion.toUpperCase()}`;
+          songEl.innerText = getSong(topEmotion) || "🎵 No suggestion";
+        } else {
+          emotionEl.innerText = "No face detected.";
+          songEl.innerText = "🎵 Waiting for mood...";
+        }
+      }
+
+      function startAutoDetection() {
+        if (!streamStarted) {
+          alert("Please allow camera access first.");
           return;
         }
-
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user" }
-        });
-
-        webcam.srcObject = stream;
-        webcam.style.display = 'block';
-        streamStarted = true;
-      } catch (err) {
-        console.error("Error accessing webcam:", err);
-        alert("Camera access denied. Please allow access and try again.");
+        if (detectionInterval) clearInterval(detectionInterval);
+        detectEmotion();
+        detectionInterval = setInterval(detectEmotion, 2500);
       }
-    }
-
-    async function detectEmotion() {
-      if (!streamStarted) return;
-
-      const detection = await faceapi
-        .detectSingleFace(webcam, new faceapi.TinyFaceDetectorOptions())
-        .withFaceExpressions();
-
-      if (detection && detection.expressions) {
-        const expressions = detection.expressions;
-        const sorted = Object.entries(expressions).sort((a, b) => b[1] - a[1]);
-        const topEmotion = sorted[0][0];
-        emotionEl.innerText = `😃 Mood: ${topEmotion.toUpperCase()}`;
-        songEl.innerText = getSong(topEmotion) || "🎵 No suggestion";
-      } else {
-        emotionEl.innerText = 'No face detected.';
-        songEl.innerText = '🎵 Waiting for mood...';
-      }
-    }
-
-    function startAutoDetection() {
-      if (!streamStarted) {
-        alert("Please allow camera access first.");
-        return;
-      }
-      if (detectionInterval) clearInterval(detectionInterval);
-      detectEmotion();
-      detectionInterval = setInterval(detectEmotion, 2500);
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>
