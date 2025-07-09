@@ -82,13 +82,14 @@
       <div id="song">🎵 Waiting for mood...</div>
     </div>
     <button onclick="requestCameraAccess()">Allow Camera</button>
-    <button onclick="detectEmotion()">Scan My Mood</button>
+    <button onclick="startAutoDetection()">Scan My Mood</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <script>
     let streamStarted = false;
     let webcam, emotionEl, songEl;
+    let detectionInterval = null;
 
     window.onload = async () => {
       webcam = document.getElementById('webcam');
@@ -130,10 +131,7 @@
     }
 
     async function detectEmotion() {
-      if (!streamStarted) {
-        alert("Please allow camera access first.");
-        return;
-      }
+      if (!streamStarted) return;
 
       const detection = await faceapi
         .detectSingleFace(webcam, new faceapi.TinyFaceDetectorOptions())
@@ -160,6 +158,16 @@
         emotionEl.innerText = 'No face detected.';
         songEl.innerText = '🎵 Waiting for mood...';
       }
+    }
+
+    function startAutoDetection() {
+      if (!streamStarted) {
+        alert("Please allow camera access first.");
+        return;
+      }
+      if (detectionInterval) clearInterval(detectionInterval);
+      detectEmotion(); // detect immediately
+      detectionInterval = setInterval(detectEmotion, 2500); // scan every 2.5 seconds
     }
   </script>
 </body>
