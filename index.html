@@ -39,6 +39,7 @@
       object-fit: cover;
       border: 5px solid white;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+      display: none;
     }
     .emotion {
       font-size: 2rem;
@@ -80,74 +81,86 @@
       <h3>Recommended Song</h3>
       <div id="song">🎵 Waiting for mood...</div>
     </div>
+    <button onclick="requestCameraAccess()">Allow Camera</button>
     <button onclick="detectEmotion()">Scan My Mood</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <script>
+    let streamStarted = false;
+    let webcam, emotionEl, songEl;
+
     window.onload = async () => {
-      const webcam = document.getElementById('webcam');
-      const emotionEl = document.getElementById('emotion');
-      const songEl = document.getElementById('song');
-
-      const moodSongs = {
-        happy: "Pharrell Williams - Happy",
-        sad: "Adele - Someone Like You",
-        angry: "Eminem - Lose Yourself",
-        surprised: "Katy Perry - Firework",
-        neutral: "Coldplay - Paradise",
-        fearful: "Radiohead - Creep",
-        disgusted: "System Of A Down - Toxicity"
-      };
-
-      async function loadModels() {
-        const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
-        await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-        await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
-      }
-
-      const startWebcam = async () => {
-        try {
-          const devices = await navigator.mediaDevices.enumerateDevices();
-          const hasCamera = devices.some(device => device.kind === 'videoinput');
-
-          if (!hasCamera) {
-            alert("No webcam found on this device.");
-            emotionEl.innerText = "No webcam available.";
-            return;
-          }
-
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "user" }
-          });
-          webcam.srcObject = stream;
-          console.log("Webcam started.");
-        } catch (err) {
-          console.error("Error accessing webcam:", err);
-          alert("Webcam error: " + err.message);
-        }
-      };
-
-      window.detectEmotion = async function () {
-        const detection = await faceapi
-          .detectSingleFace(webcam, new faceapi.TinyFaceDetectorOptions())
-          .withFaceExpressions();
-
-        if (detection && detection.expressions) {
-          const expressions = detection.expressions;
-          const sorted = Object.entries(expressions).sort((a, b) => b[1] - a[1]);
-          const topEmotion = sorted[0][0];
-          emotionEl.innerText = `😃 Mood: ${topEmotion.toUpperCase()}`;
-          songEl.innerText = moodSongs[topEmotion] || '🎵 No suggestion';
-        } else {
-          emotionEl.innerText = 'No face detected.';
-          songEl.innerText = '🎵 Waiting for mood...';
-        }
-      };
+      webcam = document.getElementById('webcam');
+      emotionEl = document.getElementById('emotion');
+      songEl = document.getElementById('song');
 
       await loadModels();
-      await startWebcam();
     };
+
+    async function loadModels() {
+      const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
+      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+      await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+    }
+
+    async function requestCameraAccess() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const hasCamera = devices.some(device => device.kind === 'videoinput');
+
+        if (!hasCamera) {
+          alert("No webcam found on this device.");
+          emotionEl.innerText = "No webcam available.";
+          return;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" }
+        });
+
+        webcam.srcObject = stream;
+        webcam.style.display = 'block';
+        streamStarted = true;
+        console.log("Webcam started.");
+      } catch (err) {
+        console.error("Error accessing webcam:", err);
+        alert("Camera access denied. Please allow access and try again.");
+      }
+    }
+
+    async function detectEmotion() {
+      if (!streamStarted) {
+        alert("Please allow camera access first.");
+        return;
+      }
+
+      const detection = await faceapi
+        .detectSingleFace(webcam, new faceapi.TinyFaceDetectorOptions())
+        .withFaceExpressions();
+
+      if (detection && detection.expressions) {
+        const expressions = detection.expressions;
+        const sorted = Object.entries(expressions).sort((a, b) => b[1] - a[1]);
+        const topEmotion = sorted[0][0];
+        emotionEl.innerText = `😃 Mood: ${topEmotion.toUpperCase()}`;
+
+        const moodSongs = {
+          happy: "Pharrell Williams - Happy",
+          sad: "Adele - Someone Like You",
+          angry: "Eminem - Lose Yourself",
+          surprised: "Katy Perry - Firework",
+          neutral: "Coldplay - Paradise",
+          fearful: "Radiohead - Creep",
+          disgusted: "System Of A Down - Toxicity"
+        };
+
+        songEl.innerText = moodSongs[topEmotion] || '🎵 No suggestion';
+      } else {
+        emotionEl.innerText = 'No face detected.';
+        songEl.innerText = '🎵 Waiting for mood...';
+      }
+    }
   </script>
 </body>
 </html>
