@@ -108,11 +108,23 @@
 
       const startWebcam = async () => {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const hasCamera = devices.some(device => device.kind === 'videoinput');
+
+          if (!hasCamera) {
+            alert("No webcam found on this device.");
+            emotionEl.innerText = "No webcam available.";
+            return;
+          }
+
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" }
+          });
           webcam.srcObject = stream;
+          console.log("Webcam started.");
         } catch (err) {
-            alert('Camera Not Found');
-          console.error('Error accessing webcam:', err);
+          console.error("Error accessing webcam:", err);
+          alert("Webcam error: " + err.message);
         }
       };
 
