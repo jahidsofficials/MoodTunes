@@ -29,13 +29,9 @@
     }
 
     .container {
-    text-align: center;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
+      text-align: center;
+      z-index: 2;
+    }
     video {
       border-radius: 50%;
       width: 200px;
@@ -44,6 +40,7 @@
       border: 5px solid white;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
       display: none;
+      transform: scaleX(-1); /* ✅ Mirror effect fixed */
     }
     .emotion {
       font-size: 2rem;
@@ -170,8 +167,8 @@
         return;
       }
       if (detectionInterval) clearInterval(detectionInterval);
-      detectEmotion(); // detect immediately
-      detectionInterval = setInterval(detectEmotion, 2500); // scan every 2.5 seconds
+      detectEmotion();
+      detectionInterval = setInterval(detectEmotion, 2500);
     }
   </script>
 </body>
