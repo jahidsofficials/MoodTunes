@@ -28,14 +28,14 @@
       100% { background-position: 0% 50%; }
     }
 
-   .container {
-      text-align: center;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
+     .container {
+        text-align: center;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
     video {
       border-radius: 50%;
       width: 200px;
@@ -60,6 +60,22 @@
     .song-box h3 {
       margin-bottom: 10px;
     }
+    .play {
+      background: #7f5eb751;
+      width: 40px;
+      height: 40px;
+      border: 1px solid #fff;
+      font-size: 22px;
+      border-radius: 50%;
+      padding-top: 6px;
+      padding-left: 6px;
+      margin: 0 auto;
+      cursor: pointer;
+      transition: .3s linear;
+    }
+    .play:hover {
+      transform: scale(1.1);
+    }
     button {
       margin-top: 20px;
       padding: 10px 20px;
@@ -83,6 +99,7 @@
     <video id="webcam" autoplay muted></video>
     <div class="emotion" id="emotion">Detecting Mood...</div>
     <div class="song-box">
+      <h2 class="play">▶</h2>
       <h3>Recommended Song</h3>
       <div id="song">🎵 Waiting for mood...</div>
     </div>
@@ -92,6 +109,47 @@
 
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <script>
+    const moodSongs = {
+      happy: "Pharrell Williams - Happy",
+      sad: "Adele - Someone Like You",
+      angry: "Eminem - Lose Yourself",
+      surprised: "Katy Perry - Firework",
+      neutral: "Coldplay - Paradise",
+      fearful: "Radiohead - Creep",
+      disgusted: "System Of A Down - Toxicity"
+    };
+
+    const songs = [
+      { title: 'Feel-Good', type: 'happy', src: 'Feel-Good(chosic.com).mp3' },
+      { title: 'Heartbreaking', type: 'sad', src: 'Heartbreaking(chosic.com).mp3' },
+      { title: 'Metaphonk', type: 'angry', src: 'Metaphonk-Long-Version(chosic.com).mp3' },
+      { title: 'Code Switch', type: 'surprised', src: 'Punch-Deck-Code-Switch-chosic.com_.mp3' },
+      { title: 'Birds Singing', type: 'neutral', src: 'dcpoke__birds-singing-03(chosic.com).mp3' },
+      { title: 'One Day', type: 'fearful', src: 'Roa-One-Day(chosic.com).mp3' },
+      { title: 'Lost and Found', type: 'disgusted', src: 'Lost-and-Found(chosic.com).mp3' }
+    ];
+
+    let music = new Audio();
+
+    function getSong(type) {
+      const filtered = songs.filter(s => s.type.toLowerCase() === type.toLowerCase());
+      if (!filtered.length) return null;
+      const random = filtered[Math.floor(Math.random() * filtered.length)];
+      music.src = 'music/' + random.src;
+      music.play();
+      return random.title;
+    }
+
+    document.querySelector('.play').addEventListener('click', () => {
+      if (music.paused) {
+        music.play();
+        document.querySelector('.play').innerText = '⏸';
+      } else {
+        music.pause();
+        document.querySelector('.play').innerText = '▶';
+      }
+    });
+
     let streamStarted = false;
     let webcam, emotionEl, songEl;
     let detectionInterval = null;
@@ -100,7 +158,6 @@
       webcam = document.getElementById('webcam');
       emotionEl = document.getElementById('emotion');
       songEl = document.getElementById('song');
-
       await loadModels();
     };
 
@@ -128,7 +185,6 @@
         webcam.srcObject = stream;
         webcam.style.display = 'block';
         streamStarted = true;
-        console.log("Webcam started.");
       } catch (err) {
         console.error("Error accessing webcam:", err);
         alert("Camera access denied. Please allow access and try again.");
@@ -147,18 +203,7 @@
         const sorted = Object.entries(expressions).sort((a, b) => b[1] - a[1]);
         const topEmotion = sorted[0][0];
         emotionEl.innerText = `😃 Mood: ${topEmotion.toUpperCase()}`;
-
-        const moodSongs = {
-          happy: "Pharrell Williams - Happy",
-          sad: "Adele - Someone Like You",
-          angry: "Eminem - Lose Yourself",
-          surprised: "Katy Perry - Firework",
-          neutral: "Coldplay - Paradise",
-          fearful: "Radiohead - Creep",
-          disgusted: "System Of A Down - Toxicity"
-        };
-
-        songEl.innerText = moodSongs[topEmotion] || '🎵 No suggestion';
+        songEl.innerText = getSong(topEmotion) || "🎵 No suggestion";
       } else {
         emotionEl.innerText = 'No face detected.';
         songEl.innerText = '🎵 Waiting for mood...';
